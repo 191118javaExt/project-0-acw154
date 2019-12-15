@@ -291,14 +291,14 @@ public class UserDAOImpl implements UserDAO {
 	@Override
 	public boolean denyUser(User u) {
 		try (Connection conn = ConnectionUtil.getConnection()){
-			String query = "UPDATE project0.users SET approval_status = (?), account_id = (?) WHERE username = (?);";		
+			String query = "UPDATE project0.users SET approval_status = (?) WHERE username = (?);";		
 			PreparedStatement stmt = conn.prepareStatement(query);
 			stmt.setInt(1, -1);
-			stmt.setInt(2, java.sql.Types.NULL);
-			stmt.setString(3, u.getUsername());
+			//stmt.setInt(2, java.sql.Types.NULL);
+			stmt.setString(2, u.getUsername());
 			if(!stmt.execute()) {
 				u.setApprovalStatus(-1);
-				u.setAccount_id(-1);
+				u.setAccount_id(0);
 				return true;
 			}
 		} catch (SQLException exc) {

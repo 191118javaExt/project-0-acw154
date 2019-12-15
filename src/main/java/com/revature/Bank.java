@@ -9,6 +9,7 @@ import com.revature.services.*;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -29,7 +30,7 @@ public class Bank {
 		while(!quit) {
 			if(!loggedIn) {
 				loggedIn = displayLogIn();
-			}else if(loggedIn && current.getApprovalStatus() == 0){
+			}else if(loggedIn && current.getApprovalStatus() <= 0){
 				current = null;
 				System.out.println("User is not approved.");
 				loggedIn = displayLogIn();
@@ -82,6 +83,16 @@ public class Bank {
 		return false;
 	}
 	
+	public void delay() {
+		try
+		{
+		    Thread.sleep(2000);
+		}
+		catch(InterruptedException ex)
+		{
+		    Thread.currentThread().interrupt();
+		}
+	}
 	public void mainMenu() {
 		boolean terminated = false;
 		Scanner sc = new Scanner(System.in);
@@ -100,6 +111,8 @@ public class Bank {
 			case "1": {
 				System.out.println("----------------");
 				System.out.println("Your balance is " + as.getBalance(currAccount));
+				System.out.println("-------------------");
+				delay();
 				break;
 			}
 			case "2": {
@@ -107,14 +120,21 @@ public class Bank {
 				System.out.println("How much money would you like to withdraw?");
 				try {
 					double val = moneyFormatter(sc.nextDouble());
-					if(as.withdraw(currAccount, val)) {
-						System.out.println("Transaction Successful. Your account balance is now: $" + currAccount.getBalance());
+					if(val < 0) {
+						System.out.println("Input must be a non-negative number");
+					} else if(Double.toString(val).length() > 15) {
+						System.out.println("Suspicious withdrawal amount. Alerting the authorities");
+					} else if(as.withdraw(currAccount, val)) {
+						System.out.println("Transaction Successful. Your account balance is now: $" + as.getBalance(currAccount));
 					} else {
 						System.out.println("Withdrawal amount cannot exceed account balance");
 					}
 				} catch (InputMismatchException e) {
 					System.out.println("Withdrawal amount must be in decimal format");
 				}
+				System.out.println("-------------------");
+				delay();
+				sc.nextLine();
 				break;
 			}
 			case "3": {
@@ -122,10 +142,19 @@ public class Bank {
 				System.out.println("How much money would you like to deposit?");
 				try{
 					double val = moneyFormatter(sc.nextDouble());
-					as.deposit(currAccount, val);
+					if(val < 0) {
+						System.out.println("Input must be a non-negative number");
+					} else if(Double.toString(val).length() > 15) {
+						System.out.println("Suspicious deposit amount. Alerting the authorities");
+					} else if(as.deposit(currAccount, val)) {
+						System.out.println("Deposited " + val);
+					}
 				} catch (InputMismatchException e) {
 					System.out.println("Deposit amount must be in decimal format");
 				}
+				System.out.println("-------------------");
+				delay();
+				sc.nextLine();
 				break;
 			}
 			case "4": {
@@ -137,7 +166,12 @@ public class Bank {
 					if(other != null) {
 						System.out.println("How much money would you like to transfer?");
 						double val = moneyFormatter(sc.nextDouble());
-						if(val >= currAccount.getBalance()) {
+						if(val < 0) {
+							System.out.println("Input must be a non-negative number");
+						} else if(Double.toString(val).length() > 15) {
+							System.out.println("Suspicious transfer amount. Alerting the authorities");
+						} else if(val <= as.getBalance(currAccount)) {
+					
 							as.transfer(currAccount, other, val);
 						} else {
 							System.out.println("Account balance cannot be less than transfer amount");
@@ -148,6 +182,9 @@ public class Bank {
 				} catch (InputMismatchException e) {
 					System.out.println("Deposit amount must be in decimal format");
 				}
+				System.out.println("-------------------");
+				delay();
+				sc.nextLine();
 				break;
 			}
 			case "Q": {
@@ -240,21 +277,14 @@ public class Bank {
 				List<User> list = us.findAllUsers();
 				printUserList(list);
 				System.out.println("-------------------");
-				System.out.println("Press enter to continue");
-				if(sc.nextLine()=="") {
-					break;
-				}
+				delay();
 				//format output of users
 				break;
 			}
 			case "2":{
 				List<User> list = us.findAllPending();
 				printUserList(list);
-				System.out.println("-------------------");
-				System.out.println("Press enter to continue");
-				if(sc.nextLine() == "") {
-					break;
-				}
+				delay();
 				break;
 			}
 			case "3":{
@@ -264,10 +294,7 @@ public class Bank {
 					User u = us.findUser(name);
 					printUser(u);
 					System.out.println("-------------------");
-					System.out.println("Press enter to continue");
-					if(sc.nextLine()=="") {
-						break;
-					}
+					delay();
 				} else {
 					System.out.println("User not found.");
 				}
@@ -284,18 +311,27 @@ public class Bank {
 						System.out.println("You do not have permission to approve this User");
 					} else {
 						System.out.println("[A]pprove, [D]eny, or [Q]uit?");
-						String choice = sc.nextLine();
+						String choice = sc.nextLine().toUpperCase();
 						switch(choice) {
 						case "A":{
+							if(u.getApprovalStatus() > 0) {
+								System.out.println("User has already been approved");
+								break;
+							}
 							if (u.getRole().equals("Employee")) {
 								us.approveEmployee(u);
 								System.out.println("Employee " + u.getUsername() + " Approved");
-							} else {
-								int curr_id = as.getNextIDInSequence();
-								if(curr_id != -1 && u.getAccount_id() == -1) {
+							} else if(u.getRole().equals("Client")){
+								int curr_id;
+								if(as.getAllAccounts().isEmpty()) {
+									curr_id = 1000;
+								} else {
+									curr_id = as.getNextIDInSequence();
+								}
+								if(curr_id != -1 && u.getAccount_id() <= 0) {
 									Account a = new Account(curr_id, 0.0, 0);
 									as.insert(a);
-									if(us.approveClient(u, a)) {
+									if(us.approveClient(u, a)) {	
 										System.out.println("Successfully approved Client " + u.getUsername() + " with Account ID " + curr_id );
 									} else {
 										as.delete(a);
@@ -368,10 +404,7 @@ public class Bank {
 				List<User> list = us.findAllUsers();
 				printUserList(list);
 				System.out.println("-------------------");
-				System.out.println("Press enter to continue");
-				if(sc.nextLine() == "") {
-					break;
-				}
+				delay();
 				//format output of users
 				break;
 			}
@@ -379,10 +412,7 @@ public class Bank {
 				List<User> list = us.findAllPending();
 				printUserList(list);
 				System.out.println("-------------------");
-				System.out.println("Press enter to continue");
-				if(sc.nextLine() == "") {
-					break;
-				}
+				delay();
 				break;
 			}
 			case "3":{
@@ -392,10 +422,7 @@ public class Bank {
 					User u = us.findUser(name);
 					printUser(u);
 					System.out.println("-------------------");
-					System.out.println("Press enter to continue");
-					if(sc.nextLine() == "") {
-						break;
-					}
+					delay();
 				} else {
 					System.out.println("User not found.");
 				}
@@ -423,7 +450,7 @@ public class Bank {
 							} else {
 								curr_id = as.getNextIDInSequence();
 							}
-							if(curr_id != -1 && u.getAccount_id() == 0) {
+							if(curr_id != -1 && u.getAccount_id() <= 0) {
 								Account a = new Account(curr_id, 0.0, 0);
 								as.insert(a);
 								if(us.approveClient(u, a)) {	
@@ -485,9 +512,9 @@ public class Bank {
 							System.out.println("Cannot change current User's username");
 							break;
 						}
-						System.out.println("Enter the new username. Usernames must be between 4 and 16 characters in length.");
+						System.out.println("Enter the new username. Usernames must be between 4-20 characters in length.");
 						String newUser = sc.nextLine();
-						if(newUser.length() < 4 || newUser.length() > 16) {
+						if(newUser.length() < 4 || newUser.length() > 20) {
 							System.out.println("Username does not match requirements.");
 							break;
 						} else if(checkUser(newUser)) {
@@ -507,11 +534,28 @@ public class Bank {
 						// Check if current Password is being operated on
 						System.out.println("Enter the new password.");
 						String newPass = sc.nextLine();
-						us.updatePassword(u, newPass);
+						if(current.equals(u)) {
+							if(us.updatePassword(u, newPass)) {
+								current.setPassword(DigestUtils.sha256Hex(newPass));
+								System.out.println("Password changed to " + newPass);
+							} else {
+								System.out.println("Update password failed");
+							}
+						} else {
+							if(us.updatePassword(u, newPass)) {
+								System.out.println("Password changed to " + newPass);
+							} else {
+								System.out.println("Update password failed");
+							}
+						}
 						break;
 					}
 					case "3": {
 						// Sanitize Char input
+						if(u.equals(current)) {
+							System.out.println("Cannot change the role of the user in session");
+							break;
+						}
 						System.out.println("What Role would you like to change the User to?");
 						System.out.println("[C]lient --- [E]mployee --- [A]dmin");
 						char newRole = sc.nextLine().toUpperCase().charAt(0);
@@ -527,11 +571,16 @@ public class Bank {
 						break;
 					}
 					case "4": {
-						System.out.println("Change to: [D]enied, [P]ending, or [A]pproved");
+						if(u.equals(current)) {
+							System.out.println("Cannot change the role of the user in session");
+							break;
+						}
+						System.out.println("Change to: [D]enied, [P]ending, or [A]pproved?");
+						System.out.println("[Q] to quit");
 						String newStatus = sc.nextLine().toUpperCase().substring(0, 1);
 						switch(newStatus) {
 						case "D":{
-							if(us.denyUser(u)) {
+							if(us.denyUser(u)){
 								System.out.println("Approval Status changed to Denied");
 							} else {
 								System.out.println("Unable to change Approval Status");
@@ -539,9 +588,11 @@ public class Bank {
 							break;
 						}
 						case "P":{
-							if(u.getAccount_id() != -1) {
+							if(u.getAccount_id() <= 0) {
 								if(us.setPending(u)) {
-									u.setAccount_id(-1);
+									if(u.getAccount_id() > 0) {
+										us.detachAccount(u);
+									}
 									System.out.println("Approval Status changed to Pending.");
 								} else {
 									System.out.println("Unable to change Approval Status");
@@ -556,7 +607,7 @@ public class Bank {
 							}
 							if(u.getRole().equals("Client")) {
 								int curr_id = as.getNextIDInSequence();
-								if(curr_id != -1 && u.getAccount_id() == 0) {
+								if(curr_id != -1 && u.getAccount_id() <= 0) {
 									Account a = new Account(curr_id, 0.0, 0);
 									if(us.approveClient(u, a)) {
 										as.insert(a);
@@ -574,6 +625,10 @@ public class Bank {
 									System.out.println("Unable to change Approval Status");
 								}
 							}
+							break;
+						}
+						case "Q": {
+							System.out.println("Leaving Approval Modification Menu");
 							break;
 						}
 						}
@@ -687,9 +742,12 @@ public class Bank {
 						case "1": {
 							System.out.println("How much would you like to withdraw?");
 							double amt = moneyFormatter(Double.parseDouble(sc.nextLine()));
-							if (amt > a.getBalance()) {
+							if(amt < 0) {
+								System.out.println("Input must be a non-negative number");
+							} else if(Double.toString(amt).length() > 15) {
+								System.out.println("Suspicious withdrawal amount. Alerting the authorities. Admins are not above the law");
+							} else if (amt > a.getBalance()) {
 								System.out.println("Amount withdrawn must be less than or equal to account balance");
-								break;
 							} else {
 								if(as.withdraw(a, amt)) {
 									System.out.println("Withdrew " + amt + "from Account" + a.getAccount_id());
@@ -697,16 +755,26 @@ public class Bank {
 									System.out.println("Unable to withdraw");
 								}
 							}
+							System.out.println("-------------------");
+							delay();
+							sc.nextLine();
 							break;
 						}
 						case "2": {
 							System.out.println("How much would you like to deposit");
 							double amt = moneyFormatter(Double.parseDouble(sc.nextLine()));
-							if(as.deposit(a, amt)) {
+							if(amt < 0) {
+								System.out.println("Input must be a non-negative number");
+							} else if(Double.toString(amt).length() > 15) {
+								System.out.println("Suspicious deposit amount. Alerting the authorities. Admins are not above the law");
+							} else if(as.deposit(a, amt)) {
 								System.out.println("Deposit of " + amt + " into Account " + a.getAccount_id() + " Successful");
 							} else {
 								System.out.println("Unable to deposit");
 							}
+							System.out.println("-------------------");
+							delay();
+							sc.nextLine();
 							break;
 						}
 						case "3": {
@@ -715,7 +783,11 @@ public class Bank {
 							Account to = as.getAccount(to_id);
 							System.out.println("Enter the amount you would like to transfer");
 							double amt = moneyFormatter(Double.parseDouble(sc.nextLine()));
-							if(amt > a.getBalance()) {
+							if(amt < 0) {
+								System.out.println("Input must be a non-negative number");
+							} else if(Double.toString(amt).length() > 15) {
+								System.out.println("Suspicious transfer amount. Alerting the authorities");
+							} else if(amt > as.getBalance(a)) {
 								System.out.println("The bank account you are transferring from does not have enough money");
 							} else {
 								if(as.transfer(a, to, amt)) {
@@ -725,6 +797,9 @@ public class Bank {
 									System.out.println("Unable to transfer");
 								}
 							}
+							System.out.println("-------------------");
+							delay();
+							sc.nextLine();
 							break;
 						}
 						case "4": {
@@ -794,9 +869,9 @@ public class Bank {
 					break;
 				}
 				case "R": {
-					System.out.println("Please enter a username. Usernames must be between 4 and 16 characters.");
+					System.out.println("Please enter a username. Usernames must be between 4-20 characters.");
 					String name = sc.nextLine();
-					if(name.length() < 4 || name.length() > 16) {
+					if(name.length() < 4 || name.length() > 20) {
 						System.out.println("Username does not match requirements.");
 						break;
 					}
