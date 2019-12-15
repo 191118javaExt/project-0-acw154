@@ -24,6 +24,7 @@ public class Bank {
 	
 	public Bank() {
 		super();
+		runInstance();
 	}
 
 	public void runInstance() {
@@ -201,23 +202,27 @@ public class Bank {
 		
 	}
 	public void printUserList(List<User> list) {
-		System.out.println(String.format("%-20s%-20s%-12s%-12s%-6s", "Username", "Password", "Role", "Status", "Account ID"));
-		for (User u : list) {
-			String status;
-			String accountNum;
-			if(u.getApprovalStatus() > 0) {
-				status = "Approved";
-				accountNum = Integer.toString(u.getAccount_id());
-			} else if(u.getApprovalStatus() == 0){
-				status = "Pending";
-				accountNum = "N/A";
-			} else {
-				status = "Denied";
-				accountNum = "N/A";
-			}
+		if(list.isEmpty()) {
+			System.out.println("No Users fit the requirements");
+		} else {
+			System.out.println(String.format("%-20s%-20s%-12s%-12s%-6s", "Username", "Password", "Role", "Status", "Account ID"));
+			for (User u : list) {
+				String status;
+				String accountNum;
+				if(u.getApprovalStatus() > 0) {
+					status = "Approved";
+					accountNum = Integer.toString(u.getAccount_id());
+				} else if(u.getApprovalStatus() == 0){
+					status = "Pending";
+					accountNum = "N/A";
+				} else {
+					status = "Denied";
+					accountNum = "N/A";
+				}
 			
 			System.out.println(String.format("%-20s%-20s%-12s%-12s%-6s", u.getUsername(),
 					u.getPassword().substring(0, 10) + "...", u.getRole(), status, accountNum));
+			}
 		}
 	}
 	
@@ -240,12 +245,16 @@ public class Bank {
 	}
 	
 	public void printAllAccounts(List<Account> list) {
-		System.out.println(String.format("%-15s%-35s%-20s", "Account ID", "Balance", "# of Transactions"));
-		for (Account a : list) {
-			String id = Integer.toString(a.getAccount_id());
-			String bal = Double.toString(a.getBalance());
-			String tCounter = Integer.toString(a.getTransCounter());
-			System.out.println(String.format("%-15s%-35s%-20s", id, bal, tCounter));
+		if(list.isEmpty()) {
+			System.out.println("No accounts fit the requirements");
+		} else {
+			System.out.println(String.format("%-15s%-35s%-20s", "Account ID", "Balance", "# of Transactions"));
+			for (Account a : list) {
+				String id = Integer.toString(a.getAccount_id());
+				String bal = Double.toString(a.getBalance());
+				String tCounter = Integer.toString(a.getTransCounter());
+				System.out.println(String.format("%-15s%-35s%-20s", id, bal, tCounter));
+			}
 		}
 	}
 	
@@ -611,7 +620,7 @@ public class Bank {
 									Account a = new Account(curr_id, 0.0, 0);
 									if(us.approveClient(u, a)) {
 										as.insert(a);
-										System.out.println("Successfully approved Client " + u.getUsername() + "with Account ID " + curr_id );
+										System.out.println("Successfully approved Client " + u.getUsername() + " with Account ID " + curr_id );
 									} else {
 										System.out.println("Error: Client approval failed");
 									}
@@ -632,6 +641,7 @@ public class Bank {
 							break;
 						}
 						}
+						break;
 					}
 					case "5": {
 						// Check if user is employee or client
@@ -688,12 +698,14 @@ public class Bank {
 							if(a != null) {
 								as.delete(a);
 							}
-							System.out.println("User " + name + "deleted");							
+							System.out.println("User " + name + " deleted");							
 						} else {
 							System.out.println("Unable to delete user");
 						}
 					}
 					
+				} else {
+					System.out.println("User does not exist");
 				}
 				break;
 			}
@@ -704,6 +716,7 @@ public class Bank {
 				if(sc.nextLine() == "") {
 					break;
 				}
+				break;
 			}
 			case "8": {
 				System.out.println("Please enter the Account ID that you would like to view");
@@ -750,7 +763,7 @@ public class Bank {
 								System.out.println("Amount withdrawn must be less than or equal to account balance");
 							} else {
 								if(as.withdraw(a, amt)) {
-									System.out.println("Withdrew " + amt + "from Account" + a.getAccount_id());
+									System.out.println("Withdrew " + amt + " from Account" + a.getAccount_id());
 								} else {
 									System.out.println("Unable to withdraw");
 								}
@@ -810,7 +823,7 @@ public class Bank {
 										us.detachAccount(user);
 									}
 								}
-								System.out.println("Account " + holder + "deleted");	
+								System.out.println("Account " + holder + " deleted");	
 							} else {
 								System.out.println("Unable to delete");
 							}
@@ -831,6 +844,7 @@ public class Bank {
 					System.out.println("Invalid Numerical Input");
 					break;
 				}
+				break;
 			}
 			case "Q":{
 				terminated = true;

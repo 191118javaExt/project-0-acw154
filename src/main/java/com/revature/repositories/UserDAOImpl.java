@@ -21,8 +21,10 @@ public class UserDAOImpl implements UserDAO {
 	public List<User> findAllActive() {
 		List<User> list = new ArrayList<>();
 		try (Connection conn = ConnectionUtil.getConnection()){
-			String query = "SELECT * FROM project0.users WHERE (approval_status = 1)";
+			// String query = "SELECT * FROM project0.users WHERE (approval_status = 1)";
+			String query = "SELECT * FROM project0.GetUsersByStatus(?);";
 			PreparedStatement stmt = conn.prepareStatement(query);
+			stmt.setInt(1, 1);
 			ResultSet rs = stmt.executeQuery();
 			while(rs.next()) {
 				//int id = rs.getInt("user_id");
@@ -45,8 +47,10 @@ public class UserDAOImpl implements UserDAO {
 	public List<User> findAllPending() {
 		List<User> list = new ArrayList<>();
 		try (Connection conn = ConnectionUtil.getConnection()){
-			String query = "SELECT * FROM project0.users WHERE (approval_status = 0);";
+			//String query = "SELECT * FROM project0.users WHERE (approval_status = 0);";
+			String query = "SELECT * FROM project0.GetUsersByStatus(?);";
 			PreparedStatement stmt = conn.prepareStatement(query);
+			stmt.setInt(1, 0);
 			ResultSet rs = stmt.executeQuery();
 			while(rs.next()) {
 				//int id = rs.getInt("u_id");

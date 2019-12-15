@@ -57,7 +57,7 @@ public class AccountDAOImpl implements AccountDAO{
 			logger.warn("Operation 'Deposit' Failed; " + e.getMessage());
 			return false;
 		}
-		logger.info(a.getAccount_id() + ": Deposit of " + amt + " successful");
+		logger.info("Account " + a.getAccount_id() + ": Deposit of " + amt + " successful");
 		return true;
 	}
 
@@ -82,7 +82,7 @@ public class AccountDAOImpl implements AccountDAO{
 			logger.warn("Operation 'Withdraw' Failed; " + e.getMessage());
 			return false;
 		}
-		logger.info(a.getAccount_id() + ": Withdrawal of " + amt + " successful");
+		logger.info("Account " + a.getAccount_id() + ": Withdrawal of " + amt + " successful");
 		return true;
 	}
 
