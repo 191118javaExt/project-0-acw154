@@ -279,6 +279,8 @@ public class Bank {
 			System.out.println("2 - View Pending Users");
 			System.out.println("3 - View Specific User");
 			System.out.println("4 - Approve/Deny User");
+			System.out.println("5 - View All Accounts");
+			System.out.println("6 - View Specific Account");
 			System.out.println("Q - Log Out");
 			String input = sc.nextLine();
 			switch(input.toUpperCase()) {
@@ -306,6 +308,11 @@ public class Bank {
 					delay();
 				} else {
 					System.out.println("User not found.");
+					System.out.println("-------------------");
+					System.out.println("Press any key to continue");
+					if(sc.nextLine() == "") {
+						break;
+					}
 				}
 				break;			
 			}
@@ -376,6 +383,42 @@ public class Bank {
 				}
 				break;
 			}
+			case "5": {
+				printAllAccounts(as.getAllAccounts());
+				System.out.println("-------------------");
+				System.out.println("Press any key to continue");
+				if(sc.nextLine() == "") {
+					break;
+				}
+				break;
+			}
+			case "6": {
+				System.out.println("Please enter the Account ID that you would like to view");
+				try{
+					int id = Integer.parseInt(sc.nextLine());
+					Account a = as.getAccount(id);
+					if(a != null) {
+						printAccount(a);
+						System.out.println("-------------------");
+						System.out.println("Press any key to continue");
+						if(sc.nextLine() == "") {
+							break;
+						}
+					} else {
+						System.out.println("Account does not exist");
+						System.out.println("-------------------");
+						System.out.println("Press any key to continue");
+						if(sc.nextLine() == "") {
+							break;
+						}
+					}
+				} catch (NumberFormatException e) {
+					System.out.println("Invalid Account Input");
+					break;
+				}
+				break;
+				
+			}
 			case "Q":{
 				terminated = true;
 				break;
@@ -434,6 +477,11 @@ public class Bank {
 					delay();
 				} else {
 					System.out.println("User not found.");
+					System.out.println("-------------------");
+					System.out.println("Press any key to continue");
+					if(sc.nextLine() == "") {
+						break;
+					}
 				}
 				break;			
 			}
@@ -482,7 +530,7 @@ public class Bank {
 						if(us.denyUser(u)) {
 							System.out.println("Successfully denied ");
 						} else {
-							System.out.println("Account was not successfully denied");
+							System.out.println("User was not successfully denied");
 						}
 						break;
 					}
@@ -725,6 +773,13 @@ public class Bank {
 					Account a = as.getAccount(id);
 					if(a != null) {
 						printAccount(a);
+						System.out.println("-------------------");
+						System.out.println("Press any key to continue");
+						if(sc.nextLine() == "") {
+							break;
+						}
+					} else {
+						System.out.println("Account does not exist");
 						System.out.println("-------------------");
 						System.out.println("Press any key to continue");
 						if(sc.nextLine() == "") {
