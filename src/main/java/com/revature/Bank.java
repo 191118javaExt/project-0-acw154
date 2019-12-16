@@ -24,7 +24,6 @@ public class Bank {
 	
 	public Bank() {
 		super();
-		runInstance();
 	}
 
 	public void runInstance() {
