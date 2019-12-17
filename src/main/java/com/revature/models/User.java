@@ -27,6 +27,7 @@ public class User {
 		this.approvalStatus = approvalStatus;
 		this.account_id = -1;
 	}
+	
 	public String getUsername() {
 		return username;
 	}

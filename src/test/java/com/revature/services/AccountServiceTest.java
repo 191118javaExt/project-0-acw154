@@ -6,6 +6,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -18,15 +20,8 @@ import com.revature.services.AccountService;
 import com.revature.util.ConnectionUtil;
 
 public class AccountServiceTest {
-	AccountService as;
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-		AccountService as = new AccountService();
-	}
+	AccountService as = new AccountService();
 
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-	}
 
 	@Before
 	public void setUp() throws Exception {
@@ -38,6 +33,13 @@ public class AccountServiceTest {
 			stmt.setDouble(2, 100);
 			stmt.setInt(3, 0);
 			stmt.execute();
+			String query2 = "INSERT INTO project0.account (account_id, balance, transCounter)"
+					+ "VALUES (?, ?, ?);";
+			PreparedStatement stmt2 = conn.prepareStatement(query2);
+			stmt2.setInt(1, 200);
+			stmt2.setDouble(2, 400.59);
+			stmt2.setInt(3, 0);
+			stmt2.execute();
 		} catch (SQLException e) {
 		}
 	}
@@ -52,13 +54,12 @@ public class AccountServiceTest {
 			PreparedStatement stmt = conn.prepareStatement(query);
 			stmt.setInt(1, 100);
 			stmt.execute();
+			String query2 = "DELETE FROM project0.account WHERE account_id = (?);";
+			PreparedStatement stmt2 = conn.prepareStatement(query2);
+			stmt2.setInt(1, 200);
+			stmt2.execute();
 		} catch (SQLException e) {
 		}
-	}
-
-	@Test
-	public void testGetAllAccounts() {
-		fail("Not yet implemented");
 	}
 
 	@Test
@@ -72,54 +73,107 @@ public class AccountServiceTest {
 			if(rs.next()) {
 				a = new Account(rs.getInt("account_id"), rs.getDouble("balance"), rs.getInt("transcounter"));
 			}
+			rs.close();
 		} catch (SQLException e) {
 		}
-		assertEquals(a, as.getAccount(100));
-	}
-
-	@Test
-	public void testInsert() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testDelete() {
-		fail("Not yet implemented");
+		Account b = as.getAccount(100);
+		assertEquals(b, a);
 	}
 
 	@Test
 	public void testDeposit() {
-		fail("Not yet implemented");
+		//fail("Not yet implemented");
+		Account a = as.getAccount(100);
+		as.deposit(a, 50.05);
+		double actualBal = 0;
+		try (Connection conn = ConnectionUtil.getConnection()){
+			String query = "SELECT balance FROM project0.account WHERE account_id = (?);";
+			PreparedStatement stmt = conn.prepareStatement(query);
+			stmt.setInt(1, 100);
+			ResultSet rs = stmt.executeQuery();
+			if(rs.next()) {
+				actualBal = rs.getDouble("balance");
+			}
+			rs.close();
+		} catch (SQLException e) {
+		}
+		assertEquals(new Double(150.05), new Double(actualBal));
 	}
 
 	@Test
 	public void testWithdraw() {
-		fail("Not yet implemented");
+		Account a = as.getAccount(100);
+		as.withdraw(a, 25.28);
+		double actualBal = 0;
+		try (Connection conn = ConnectionUtil.getConnection()){
+			String query = "SELECT balance FROM project0.account WHERE account_id = (?);";
+			PreparedStatement stmt = conn.prepareStatement(query);
+			stmt.setInt(1, 100);
+			ResultSet rs = stmt.executeQuery();
+			if(rs.next()) {
+				actualBal = rs.getDouble("balance");
+			}
+			rs.close();
+		} catch (SQLException e) {
+		}
+		assertEquals(new Double(74.72), new Double(actualBal));
 	}
 
 	@Test
 	public void testTransfer() {
-		fail("Not yet implemented");
+		int count = 0;
+		double[] bals = new double[2];
+		double[] expected = new double[] {100+88.88, 400.59-88.88};
+		as.transfer(as.getAccount(200), as.getAccount(100), 88.88);
+		try (Connection conn = ConnectionUtil.getConnection()){
+			String query = "SELECT balance FROM project0.account WHERE account_id IN (?, ?) ORDER BY account_id ASC;";
+			PreparedStatement stmt = conn.prepareStatement(query);
+			stmt.setInt(1, 100);
+			stmt.setInt(2, 200);
+			ResultSet rs = stmt.executeQuery();
+			while(rs.next()) {
+				bals[count] = rs.getDouble("balance");
+				count++;
+			}
+			rs.close();
+		} catch (SQLException e) {
+		}
+		assertArrayEquals(expected, bals, 0.00);
 	}
 
 	@Test
 	public void testGetNextIDInSequence() {
-		fail("Not yet implemented");
+		int nextId = 0;
+		try (Connection conn = ConnectionUtil.getConnection()){
+			String query = "SELECT MAX(account_id) as last_id FROM project0.account;";
+			PreparedStatement stmt = conn.prepareStatement(query);
+			ResultSet rs = stmt.executeQuery();
+			while(rs.next()) {
+				nextId = rs.getInt("last_id");
+			}
+			rs.close();
+		} catch (SQLException e) {
+			
+		}
+		assertEquals((nextId + 2), as.getNextIDInSequence());
 	}
-
-	@Test
-	public void testUpdateBalance() {
-		fail("Not yet implemented");
-	}
-
+	
+	
 	@Test
 	public void testGetBalance() {
-		fail("Not yet implemented");
+		double bal = 0;
+		try (Connection conn = ConnectionUtil.getConnection()){
+			String query = "SELECT balance FROM project0.account WHERE account_id = (?);";
+			PreparedStatement stmt = conn.prepareStatement(query);
+			stmt.setInt(1, 200);
+			ResultSet rs = stmt.executeQuery();
+			while(rs.next()) {
+				bal = rs.getDouble("balance");
+			}
+		} catch (SQLException e) {
+		}
+		assertEquals(new Double(400.59), new Double(bal));
 	}
 
-	@Test
-	public void testUpdateTransCounter() {
-		fail("Not yet implemented");
-	}
-
+	
 }

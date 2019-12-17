@@ -697,6 +697,10 @@ public class Bank {
 							System.out.println("Enter the new Account ID");
 							try {
 								int newID = Integer.parseInt(sc.nextLine());
+								if(newID < 0) {
+									System.out.println("Account ID must be a non-negative number");
+									break;
+								}
 								Account a = as.getAccount(newID);
 								if(a != null) {
 									if(us.updateAccount(u, a)) {

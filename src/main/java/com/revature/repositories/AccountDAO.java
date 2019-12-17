@@ -13,9 +13,7 @@ public interface AccountDAO {
 	public boolean deposit(Account a, double amt);
 	public boolean withdraw(Account a, double amt);
 	public boolean transfer(Account from, Account to, double amt);
-	public boolean updateBalance(Account a, double newVal);
 	public double getBalance(Account a);
-	public boolean updateTransCounter(Account a, int newVal);
 	public int getNextIDInSequence();
 	
 }

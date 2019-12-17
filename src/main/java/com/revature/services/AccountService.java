@@ -40,13 +40,8 @@ public class AccountService {
 		 return repository.getNextIDInSequence();
 	}
 	
-	public boolean updateBalance(Account a, double newVal) {
-		return repository.updateBalance(a, newVal);
-	}
 	public double getBalance(Account a) {
 		return repository.getBalance(a);
 	}
-	public boolean updateTransCounter(Account a, int newVal) {
-		return repository.updateTransCounter(a, newVal);
-	}
+
 }

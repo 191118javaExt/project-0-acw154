@@ -177,45 +177,6 @@ public class AccountDAOImpl implements AccountDAO{
 		}
 		return -1;
 	}
-	
-	@Override
-	public boolean updateBalance(Account a, double newVal) {
-		if(newVal < 0.0) {
-			return false;
-		}
-		try (Connection conn = ConnectionUtil.getConnection()){
-			String query = "UPDATE project0.account SET balance = (?) WHERE account_id = (?);";		
-			PreparedStatement stmt = conn.prepareStatement(query);
-			stmt.setDouble(1, newVal);
-			stmt.setInt(2, a.getAccount_id());
-			if(!stmt.execute()) {
-				a.setBalance(newVal);
-				return true;
-			}
-		} catch (SQLException exc) {
-			logger.warn("Operation 'Update Balance' Failed; " + exc.getMessage());
-			return false;
-		}
-		return true;
-	}
-
-	@Override
-	public boolean updateTransCounter(Account a, int newVal) {
-		try (Connection conn = ConnectionUtil.getConnection()){
-			String query = "UPDATE project0.account SET transCounter = (?) WHERE account_id = (?);";		
-			PreparedStatement stmt = conn.prepareStatement(query);
-			stmt.setInt(1, newVal);
-			stmt.setInt(2, a.getAccount_id());
-			if(!stmt.execute()) {
-				a.setTransCounter(newVal);
-				return true;
-			}
-		} catch (SQLException exc) {
-			logger.warn("Operation 'Update Transaction Counter' Failed; " + exc.getMessage());
-			return false;
-		}
-		return true;
-	}
 
 	@Override
 	public double getBalance(Account a) {
