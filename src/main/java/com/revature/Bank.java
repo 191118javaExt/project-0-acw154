@@ -19,8 +19,8 @@ public class Bank {
 	private Account currAccount;
 	private boolean quit = false;
 	private boolean loggedIn = false;
-	UserService us = new UserService();
-	AccountService as = new AccountService();
+	public UserService us = new UserService();
+	public AccountService as = new AccountService();
 	
 	public Bank() {
 		super();

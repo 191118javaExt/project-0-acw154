@@ -1,4 +1,4 @@
-package com.revature;
+package com.revature.services;
 
 import static org.junit.Assert.*;
 
@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.revature.Bank;
 import com.revature.models.User;
 
 public class BankTest {
