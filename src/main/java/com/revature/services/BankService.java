@@ -95,8 +95,8 @@ public class BankService {
 	
 	public int userApproval(User u) {
 		if(u.getApprovalStatus() > 0) {
-			//System.out.println("User has already been approved");
-			return 0;
+			System.out.println("User has already been approved");
+			return -2;
 		} else {
 			if(u.getRole().equals("Client")) {
 				int curr_id;
@@ -109,11 +109,11 @@ public class BankService {
 					Account a = new Account(curr_id, 0.0, 0);
 					as.insert(a);
 					if(us.approveClient(u, a)) {	
-						//System.out.println("Successfully approved Client " + u.getUsername() + " with Account ID " + curr_id );
-						return a.getAccount_id();
+						System.out.println("Successfully approved Client " + u.getUsername() + " with Account ID " + curr_id );
+						return 1;
 					} else {
 						as.delete(a);
-						//System.out.println("Error: Client approval failed");
+						System.out.println("Error: Client approval failed");
 						return -1;
 					}
 				} else {
@@ -122,15 +122,18 @@ public class BankService {
 				}
 			} else {
 				us.approveEmployee(u);
-				return 1;
+				System.out.println("Employee Approved");
 			}
 		}
+		return 0;
 	}
 	
 	public int userDenial(User u) {
 		if(us.denyUser(u)) {
+			System.out.println("User has been denied");
 			return 1;
 		} else {
+			System.out.println("Unable to deny user");
 			return -1;
 		}
 	}

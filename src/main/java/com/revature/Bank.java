@@ -413,22 +413,11 @@ public class Bank {
 					String choice = sc.nextLine().toUpperCase();
 					switch(choice) {
 					case "A":{
-						int success = bs.userApproval(u);
-						if(success > 0) {
-							System.out.println("Successfully approved Client " + u.getUsername() + " with Account ID " + success);
-						} else if (success == 0) {
-							System.out.println("User already approved");
-						} else {
-							System.out.println("User approval failed");
-						}
+						bs.userApproval(u);
 						break;
 					}
 					case "D":{
-						if(bs.userDenial(u) == 1) {
-							System.out.println("Successfully denied ");
-						} else {
-							System.out.println("User was not successfully denied");
-						}
+						bs.userDenial(u);
 						break;
 					}
 					case "Q":{
