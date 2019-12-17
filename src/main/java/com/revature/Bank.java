@@ -21,6 +21,7 @@ public class Bank {
 	private boolean loggedIn = false;
 	UserService us = new UserService();
 	AccountService as = new AccountService();
+	BankService bs = new BankService();
 	
 	public Bank() {
 		super();
@@ -200,72 +201,6 @@ public class Bank {
 		}
 		
 	}
-	public void printUserList(List<User> list) {
-		if(list.isEmpty()) {
-			System.out.println("No Users fit the requirements");
-		} else {
-			System.out.println(String.format("%-20s%-20s%-12s%-12s%-6s", "Username", "Password", "Role", "Status", "Account ID"));
-			for (User u : list) {
-				String status;
-				String accountNum;
-				if(u.getApprovalStatus() > 0) {
-					status = "Approved";
-					accountNum = Integer.toString(u.getAccount_id());
-				} else if(u.getApprovalStatus() == 0){
-					status = "Pending";
-					accountNum = "N/A";
-				} else {
-					status = "Denied";
-					accountNum = "N/A";
-				}
-			
-			System.out.println(String.format("%-20s%-20s%-12s%-12s%-6s", u.getUsername(),
-					u.getPassword().substring(0, 10) + "...", u.getRole(), status, accountNum));
-			}
-		}
-	}
-	
-	public void printUser(User u) {
-		System.out.println(String.format("%-20s%-20s%-12s%-12s%-6s", "Username", "Password", "Role", "Status", "Account ID"));
-		String status;
-		String accountNum;
-		if(u.getApprovalStatus() > 0) {
-			status = "Approved";
-			accountNum = Integer.toString(u.getAccount_id());
-		} else if(u.getApprovalStatus() == 0){
-			status = "Pending";
-			accountNum = "N/A";
-		} else {
-			status = "Denied";
-			accountNum = "N/A";
-		}
-		System.out.println(String.format("%-20s%-20s%-12s%-12s%-6s", u.getUsername(),
-				u.getPassword().substring(0, 10) + "...", u.getRole(), status, accountNum));
-	}
-	
-	public void printAllAccounts(List<Account> list) {
-		if(list.isEmpty()) {
-			System.out.println("No accounts fit the requirements");
-		} else {
-			System.out.println(String.format("%-15s%-35s%-20s", "Account ID", "Balance", "# of Transactions"));
-			for (Account a : list) {
-				String id = Integer.toString(a.getAccount_id());
-				String bal = Double.toString(a.getBalance());
-				String tCounter = Integer.toString(a.getTransCounter());
-				System.out.println(String.format("%-15s%-35s%-20s", id, bal, tCounter));
-			}
-		}
-	}
-	
-	public void printAccount(Account a) {
-		System.out.println(String.format("%-15s%-35s%-20s", "Account ID", "Balance", "# of Transactions"));
-		String id = Integer.toString(a.getAccount_id());
-		String bal = Double.toString(a.getBalance());
-		String tCounter = Integer.toString(a.getTransCounter());
-		System.out.println(String.format("%-15s%-35s%-20s", id, bal, tCounter));
-	}
-	
-	
 	
 	public void employeeMenu() {
 		//us.findAllPending()
@@ -285,7 +220,7 @@ public class Bank {
 			switch(input.toUpperCase()) {
 			case "1": {
 				List<User> list = us.findAllUsers();
-				printUserList(list);
+				bs.printUserList(list);
 				System.out.println("-------------------");
 				delay();
 				//format output of users
@@ -293,7 +228,7 @@ public class Bank {
 			}
 			case "2":{
 				List<User> list = us.findAllPending();
-				printUserList(list);
+				bs.printUserList(list);
 				delay();
 				break;
 			}
@@ -302,7 +237,7 @@ public class Bank {
 				String name = sc.nextLine();
 				if(checkUser(name)) {
 					User u = us.findUser(name);
-					printUser(u);
+					bs.printUser(u);
 					System.out.println("-------------------");
 					delay();
 				} else {
@@ -321,7 +256,7 @@ public class Bank {
 				String name = sc.nextLine();
 				if(checkUser(name)) {
 					u = us.findUser(name);
-					printUser(u);
+					bs.printUser(u);
 					if(u.getRole().equals("Admin")) {
 						System.out.println("You do not have permission to approve this User");
 					} else {
@@ -383,7 +318,7 @@ public class Bank {
 				break;
 			}
 			case "5": {
-				printAllAccounts(as.getAllAccounts());
+				bs.printAllAccounts(as.getAllAccounts());
 				System.out.println("-------------------");
 				System.out.println("Press any key to continue");
 				if(sc.nextLine() == "") {
@@ -397,7 +332,7 @@ public class Bank {
 					int id = Integer.parseInt(sc.nextLine());
 					Account a = as.getAccount(id);
 					if(a != null) {
-						printAccount(a);
+						bs.printAccount(a);
 						System.out.println("-------------------");
 						System.out.println("Press any key to continue");
 						if(sc.nextLine() == "") {
@@ -432,36 +367,20 @@ public class Bank {
 	
 	public void adminMenu() {
 		boolean terminated = false;
-		
-		
 		do {
 			Scanner sc = new Scanner(System.in);
 			System.out.println("Welcome " + current.getUsername());
-			System.out.println("Admin Menu");
-			System.out.println("1 - View All Users");
-			System.out.println("2 - View Pending Users");
-			System.out.println("3 - View User");
-			System.out.println("4 - Approve User");
-			System.out.println("5 - Modify User");
-			System.out.println("6 - Delete User");
-			System.out.println("7 - View All Accounts");
-			System.out.println("8 - View Account");
-			System.out.println("9 - Account Operations");
-			// TODO: Modify User, Account fields, Perform account transactions
-			System.out.println("Q - Quit");
-			String input = sc.nextLine();
+			String input = bs.printAdminMenu();
 			switch(input.toUpperCase()) {
 			case "1": {
-				List<User> list = us.findAllUsers();
-				printUserList(list);
+				bs.printUserList(us.findAllUsers());
 				System.out.println("-------------------");
 				delay();
 				//format output of users
 				break;
 			}
 			case "2":{
-				List<User> list = us.findAllPending();
-				printUserList(list);
+				bs.printUserList(us.findAllPending());
 				System.out.println("-------------------");
 				delay();
 				break;
@@ -470,8 +389,7 @@ public class Bank {
 				System.out.println("Please enter the username of the User you would like to view");
 				String name = sc.nextLine();
 				if(checkUser(name)) {
-					User u = us.findUser(name);
-					printUser(u);
+					bs.printUser(us.findUser(name));
 					System.out.println("-------------------");
 					delay();
 				} else {
@@ -490,43 +408,23 @@ public class Bank {
 				String name = sc.nextLine();
 				if(checkUser(name)) {
 					u = us.findUser(name);
-					printUser(u);
+					bs.printUser(u);
 					System.out.println("[A]pprove, [D]eny, or [Q]uit?");
 					String choice = sc.nextLine().toUpperCase();
 					switch(choice) {
 					case "A":{
-						if(u.getApprovalStatus() > 0) {
-							System.out.println("User has already been approved");
-							break;
-						}
-						if(u.getRole().equals("Client")) {
-							int curr_id;
-							if(as.getAllAccounts().isEmpty()) {
-								curr_id = 1000;
-							} else {
-								curr_id = as.getNextIDInSequence();
-							}
-							if(curr_id != -1 && u.getAccount_id() <= 0) {
-								Account a = new Account(curr_id, 0.0, 0);
-								as.insert(a);
-								if(us.approveClient(u, a)) {	
-									System.out.println("Successfully approved Client " + u.getUsername() + " with Account ID " + curr_id );
-								} else {
-									as.delete(a);
-									System.out.println("Error: Client approval failed");
-									
-								}
-							} else {
-								System.out.println("Account Approval failed");
-							}
-						
+						int success = bs.userApproval(u);
+						if(success > 0) {
+							System.out.println("Successfully approved Client " + u.getUsername() + " with Account ID " + success);
+						} else if (success == 0) {
+							System.out.println("User already approved");
 						} else {
-							us.approveEmployee(u);
+							System.out.println("User approval failed");
 						}
 						break;
 					}
 					case "D":{
-						if(us.denyUser(u)) {
+						if(bs.userDenial(u) == 1) {
 							System.out.println("Successfully denied ");
 						} else {
 							System.out.println("User was not successfully denied");
@@ -552,7 +450,7 @@ public class Bank {
 				String name = sc.nextLine();
 				if(checkUser(name)) {
 					User u = us.findUser(name);
-					printUser(u);
+					bs.printUser(u);
 					System.out.println("Which field would you like to modify");
 					System.out.println("1 - Username");
 					System.out.println("2 - Password");
@@ -739,7 +637,7 @@ public class Bank {
 						System.out.println("Cannot delete current User");
 						break;
 					} else {
-						printUser(u);
+						bs.printUser(u);
 						Account a = as.getAccount(u.getAccount_id());
 						if(us.delete(u)) {
 							if(a != null) {
@@ -757,7 +655,7 @@ public class Bank {
 				break;
 			}
 			case "7": {
-				printAllAccounts(as.getAllAccounts());
+				bs.printAllAccounts(as.getAllAccounts());
 				System.out.println("-------------------");
 				System.out.println("Press any key to continue");
 				if(sc.nextLine() == "") {
@@ -771,7 +669,7 @@ public class Bank {
 					int id = Integer.parseInt(sc.nextLine());
 					Account a = as.getAccount(id);
 					if(a != null) {
-						printAccount(a);
+						bs.printAccount(a);
 						System.out.println("-------------------");
 						System.out.println("Press any key to continue");
 						if(sc.nextLine() == "") {
