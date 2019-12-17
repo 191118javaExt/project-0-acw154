@@ -16,6 +16,9 @@ import com.revature.util.ConnectionUtil;
 public class AccountDAOImpl implements AccountDAO{
 	private static Logger logger = Logger.getLogger(UserDAOImpl.class);
 	
+	/**
+	 * Returns an Account object associated with the given account id
+	 */
 	@Override
 	public Account getAccount(int id) {
 		// TODO Auto-generated method stub
@@ -39,6 +42,9 @@ public class AccountDAOImpl implements AccountDAO{
 		return null;
 	}
 
+	/**
+	 * Increments the balance of the given account by a given amount.
+	 */
 	@Override
 	public boolean deposit(Account a, double amt) {
 		
@@ -61,6 +67,9 @@ public class AccountDAOImpl implements AccountDAO{
 		return true;
 	}
 
+	/**
+	 * Decrements the balance field of the given account by a given amount. s
+	 */
 	@Override
 	public boolean withdraw(Account a, double amt) {
 		if (amt > a.getBalance()) {
@@ -86,6 +95,9 @@ public class AccountDAOImpl implements AccountDAO{
 		return true;
 	}
 
+	/**
+	 * Transfers money from one account to another via the deposit and withdrawal methods
+	 */
 	@Override
 	public boolean transfer(Account from, Account to, double amt) {
 		// TODO: Ensure that transaction can be rolled back
@@ -104,6 +116,9 @@ public class AccountDAOImpl implements AccountDAO{
 		return false;
 	}
 
+	/**
+	 * Returns a list of all the accounts in the account table
+	 */
 	@Override
 	public List<Account> getAllAccounts() {
 		List<Account> list = new ArrayList<>();
@@ -125,6 +140,9 @@ public class AccountDAOImpl implements AccountDAO{
 		return list;
 	}
 
+	/**
+	 * Inserts the account object into the account table
+	 */
 	@Override
 	public boolean insert(Account a) {
 		try (Connection conn = ConnectionUtil.getConnection()){
@@ -143,7 +161,10 @@ public class AccountDAOImpl implements AccountDAO{
 		}
 		return true;
 	}
-
+	
+	/**
+	 * Deletes the record containing the specified account from the account table
+	 */
 	@Override
 	public boolean delete(Account a) {
 		try (Connection conn = ConnectionUtil.getConnection()){
@@ -159,7 +180,10 @@ public class AccountDAOImpl implements AccountDAO{
 		}
 		return true;
 	}
-
+	
+	/**
+	 * Returns the largest account_id in database and increments it by 2;
+	 */
 	@Override
 	public int getNextIDInSequence() {
 		try (Connection conn = ConnectionUtil.getConnection()){
@@ -178,6 +202,9 @@ public class AccountDAOImpl implements AccountDAO{
 		return -1;
 	}
 
+	/**
+	 * Returns the account balance of a given account 
+	 */
 	@Override
 	public double getBalance(Account a) {
 		try (Connection conn = ConnectionUtil.getConnection()){

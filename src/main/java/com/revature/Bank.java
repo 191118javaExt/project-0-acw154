@@ -73,16 +73,25 @@ public class Bank {
 		return false;
 	}
 	
+	/**
+	 * Iterates through a list of all users within database to check whether a certain username (primary key)
+	 * exists within the list and therefore database.
+	 * @param user (String) The username provided by the user through console input
+	 * @return true if the username exists in the database, false otherwise
+	 */
 	public boolean checkUser(String user) {
 		List<User> users = us.findAllUsers();
 		for (User u: users) {
-			if(u.getUsername().equalsIgnoreCase(user)) {
+			if(u.getUsername().equals(user)) {
 				return true;
 			}
 		}
 		return false;
 	}
 	
+	/**
+	 * Simple method to create a 2 second delay between console outputs
+	 */
 	public void delay() {
 		try
 		{
@@ -93,6 +102,13 @@ public class Bank {
 		    Thread.currentThread().interrupt();
 		}
 	}
+	
+	/**
+	 * Displays the Main Menu for the Client Users and will call the appropriate methods based on
+	 * input provided by the user. Clients can view their own balance as well as deposit, withdraw, and 
+	 * transfer funds to and from their own account. Transfer requires a second account ID to which the funds
+	 * will be transferred.
+	 */
 	public void mainMenu() {
 		boolean terminated = false;
 		Scanner sc = new Scanner(System.in);
@@ -200,6 +216,11 @@ public class Bank {
 		}
 		
 	}
+	
+	/**
+	 * Print method to format the list of users provided through the database
+	 * @param list (List<User>) A List of User objects
+	 */
 	public void printUserList(List<User> list) {
 		if(list.isEmpty()) {
 			System.out.println("No Users fit the requirements");
@@ -225,6 +246,10 @@ public class Bank {
 		}
 	}
 	
+	/**
+	 * Print method to format the output of a single user
+	 * @param u (User) A User object
+	 */
 	public void printUser(User u) {
 		System.out.println(String.format("%-20s%-20s%-12s%-12s%-6s", "Username", "Password", "Role", "Status", "Account ID"));
 		String status;
@@ -243,6 +268,10 @@ public class Bank {
 				u.getPassword().substring(0, 10) + "...", u.getRole(), status, accountNum));
 	}
 	
+	/**
+	 * Print method to format the output of all the accounts provided by the database
+	 * @param list (List<Account>) A list of Account objects
+	 */
 	public void printAllAccounts(List<Account> list) {
 		if(list.isEmpty()) {
 			System.out.println("No accounts fit the requirements");
@@ -257,6 +286,10 @@ public class Bank {
 		}
 	}
 	
+	/**
+	 * Print method to format the output of a single Account 
+	 * @param a (Account) An Account object
+	 */
 	public void printAccount(Account a) {
 		System.out.println(String.format("%-15s%-35s%-20s", "Account ID", "Balance", "# of Transactions"));
 		String id = Integer.toString(a.getAccount_id());
@@ -266,7 +299,11 @@ public class Bank {
 	}
 	
 	
-	
+	/**
+	 * Displays the menu for Employee Users and will run the appropriate methods based on the
+	 * user input provided. Employees can view, approve, deny all non-admin users and can view 
+	 * but not interact with accounts.
+	 */
 	public void employeeMenu() {
 		//us.findAllPending()
 		boolean terminated = false;
@@ -344,6 +381,10 @@ public class Bank {
 									curr_id = as.getNextIDInSequence();
 								}
 								if(curr_id != -1 && u.getAccount_id() <= 0) {
+									// Checks whether User currently has an account 
+									// Would have been easier to allow Accounts to be initialized without an account_id 
+									// and instead grabbed the most recent (max(account_id)) from DB to pair with the account.
+									// I realize that too late. Unfortunate.
 									Account a = new Account(curr_id, 0.0, 0);
 									as.insert(a);
 									if(us.approveClient(u, a)) {	
@@ -430,6 +471,10 @@ public class Bank {
 		} while(!terminated);
 	}
 	
+	/**
+	 * Displays the menu for administrator level users. Administrators can view all users and accounts,
+	 * can approve, deny, modify, and delete users, as well as interact with all accounts.
+	 */
 	public void adminMenu() {
 		boolean terminated = false;
 		
@@ -490,6 +535,10 @@ public class Bank {
 				String name = sc.nextLine();
 				if(checkUser(name)) {
 					u = us.findUser(name);
+					if(u.getUsername().equals(current.getUsername())) {
+						System.out.println("Cannot change approval status of current user in session");
+						break;
+					}
 					printUser(u);
 					System.out.println("[A]pprove, [D]eny, or [Q]uit?");
 					String choice = sc.nextLine().toUpperCase();
@@ -916,6 +965,11 @@ public class Bank {
 		} while(!terminated);
 	}
 	
+	/**
+	 * Displays the Log In menu for all users and allows users to register an account and log in
+	 * to an account, provided proper input.
+	 * @return true if the user has provided a valid username and password combination, false otherwise
+	 */
 	public boolean displayLogIn() {
 		System.out.println("Welcome to the Banking App");
 		System.out.println("-------------------------");
@@ -1001,6 +1055,11 @@ public class Bank {
 		
 	}
 	
+	/**
+	 * Formats a double into a 0.2f float format that represents the dollar ($)
+	 * @param d (double) A double representing money
+	 * @return (double) The double formatted in monetary format (0.00)
+	 */
 	public double moneyFormatter(double d) {
 		try {
 			DecimalFormat df = new DecimalFormat("0.00");

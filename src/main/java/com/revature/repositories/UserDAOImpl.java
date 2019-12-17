@@ -17,6 +17,9 @@ import com.revature.util.ConnectionUtil;
 public class UserDAOImpl implements UserDAO {
 	private static Logger logger = Logger.getLogger(UserDAOImpl.class);
 
+	/**
+	 * Returns a list of all the users that have been approved
+	 */
 	@Override
 	public List<User> findAllActive() {
 		List<User> list = new ArrayList<>();
@@ -42,7 +45,10 @@ public class UserDAOImpl implements UserDAO {
 		}
 		return list;
 	}
-
+	
+	/**
+	 * Finds all Users that are waiting approval
+	 */
 	@Override
 	public List<User> findAllPending() {
 		List<User> list = new ArrayList<>();
@@ -69,6 +75,9 @@ public class UserDAOImpl implements UserDAO {
 		return list;
 	}
 
+	/**
+	 * Returns a User object associated with the given username
+	 */
 	@Override
 	public User findUser(String name) {
 		User user;
@@ -92,7 +101,10 @@ public class UserDAOImpl implements UserDAO {
 		}
 		return null;
 	}
-
+	
+	/**
+	 * Inserts a User object into the user table
+	 */
 	@Override
 	public boolean insert(User u) {
 		try (Connection conn = ConnectionUtil.getConnection()){
@@ -115,7 +127,10 @@ public class UserDAOImpl implements UserDAO {
 		}
 		return true;
 	}
-
+	
+	/**
+	 * Deletes the record associated with the User object
+	 */
 	@Override
 	public boolean delete(User u) {
 		// Need to check whether user trying to be deleted is current user
@@ -134,7 +149,10 @@ public class UserDAOImpl implements UserDAO {
 		return true;
 	}
 
-
+	/**
+	 * Sets the approval status of the associated User to approved and associates a newly created account
+	 * object to the User
+	 */
 	@Override
 	public boolean approveClient(User u, Account a) {
 		try (Connection conn = ConnectionUtil.getConnection()){
@@ -155,6 +173,9 @@ public class UserDAOImpl implements UserDAO {
 		return true;
 	}
 
+	/**
+	 * Sets the approval status of an employee or admin to approved
+	 */
 	@Override
 	public boolean approveEmployee(User e) {
 		try (Connection conn = ConnectionUtil.getConnection()){
@@ -172,7 +193,10 @@ public class UserDAOImpl implements UserDAO {
 		}
 		return true;
 	}
-
+	
+	/**
+	 * Returns a list of all the users in the user table
+	 */
 	@Override
 	public List<User> findAllUsers() {
 		List<User> list = new ArrayList<>();
@@ -196,7 +220,10 @@ public class UserDAOImpl implements UserDAO {
 		}
 		return list;
 	}
-
+	
+	/**
+	 * Changes the password of a specific User to a new specified password
+	 */
 	@Override
 	public boolean updatePassword(User u, String newVal) {
 		try (Connection conn = ConnectionUtil.getConnection()){
@@ -216,6 +243,9 @@ public class UserDAOImpl implements UserDAO {
 		return true;
 	}
 
+	/**
+	 * Changes the role of a User based on a given char input
+	 */
 	@Override
 	public boolean updateRole(User u, char c) {
 		try (Connection conn = ConnectionUtil.getConnection()){
@@ -292,6 +322,9 @@ public class UserDAOImpl implements UserDAO {
 		return true;
 	}
 
+	/**
+	 * Sets the approval status of a user to denied
+	 */
 	@Override
 	public boolean denyUser(User u) {
 		try (Connection conn = ConnectionUtil.getConnection()){
@@ -312,6 +345,9 @@ public class UserDAOImpl implements UserDAO {
 		return true;
 	}
 
+	/**
+	 * Changes the username of a specific User
+	 */
 	@Override
 	public boolean updateUsername(User u, String newVal) {
 		try (Connection conn = ConnectionUtil.getConnection()){
@@ -330,6 +366,9 @@ public class UserDAOImpl implements UserDAO {
 		return true;
 	}
 
+	/**
+	 * Sets the approval status of a User to Pending
+	 */
 	@Override
 	public boolean setPending(User u) {
 		try (Connection conn = ConnectionUtil.getConnection()){
@@ -347,7 +386,10 @@ public class UserDAOImpl implements UserDAO {
 		}
 		return true;
 	}
-
+	
+	/**
+	 * Updates the account ID of the account associated with a User
+	 */
 	@Override
 	public boolean updateAccount(User u, Account a) {
 		try (Connection conn = ConnectionUtil.getConnection()){
@@ -366,6 +408,9 @@ public class UserDAOImpl implements UserDAO {
 		return true;
 	}
 	
+	/**
+	 * Remove the associated account from a User in the user table
+	 */
 	public boolean detachAccount(User u) {
 		try (Connection conn = ConnectionUtil.getConnection()){
 			String query = "UPDATE project0.users SET account_id = (?) WHERE username = (?);";		
