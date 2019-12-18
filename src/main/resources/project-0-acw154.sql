@@ -16,8 +16,8 @@ CREATE TABLE IF NOT EXISTS account (
 	balance numeric(30, 2) not null default 0,
 	transCounter INTEGER not null default 0
 );
-ALTER SEQUENCE project0.account_account_id_seq RESTART WITH 1000 INCREMENT BY 2;
-ALTER TABLE proejct0.users ADD FOREIGN KEY (account_id) REFERENCES project0.account (account_id);
+ALTER SEQUENCE account_account_id_seq RESTART WITH 1000 INCREMENT BY 2;
+ALTER TABLE users ADD FOREIGN KEY (account_id) REFERENCES account (account_id) ON DELETE CASCADE;
 
 DROP FUNCTION IF EXISTS SelectUsersByStatus;
 
@@ -27,7 +27,8 @@ $$
 	SELECT * FROM project0.users WHERE approval_status = a_status;
 $$
 LANGUAGE SQL;
-SELECT * FROM project0.users WHERE username ='with space';
+--DELETE FROM project0.account WHERE account_id = 1008;
+--SELECT * FROM project0.users WHERE username ='with space';
 UPDATE project0.users SET approval_status = 1 WHERE username = 'superuser';
 SELECT * FROM project0.users;
 SELECT * FROM project0.account;

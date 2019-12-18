@@ -714,10 +714,12 @@ public class Bank {
 								int curr_id = as.getNextIDInSequence();
 								if(curr_id != -1 && u.getAccount_id() <= 0) {
 									Account a = new Account(curr_id, 0.0, 0);
+									as.insert(a);
 									if(us.approveClient(u, a)) {
-										as.insert(a);
+										//as.insert(a);
 										System.out.println("Successfully approved Client " + u.getUsername() + " with Account ID " + curr_id );
 									} else {
+										as.delete(a);
 										System.out.println("Error: Client approval failed");
 									}
 								} else {
@@ -924,6 +926,7 @@ public class Bank {
 						}
 						case "4": {
 							int holder = a.getAccount_id();
+
 							if(as.delete(a)) {
 								for(User user: us.findAllActive()) {
 									if(holder == user.getAccount_id()) {

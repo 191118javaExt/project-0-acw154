@@ -168,7 +168,7 @@ public class AccountDAOImpl implements AccountDAO{
 	@Override
 	public boolean delete(Account a) {
 		try (Connection conn = ConnectionUtil.getConnection()){
-			String query = "DELETE FROM project0.account WHERE account_id = (?);";		
+			String query = "DELETE FROM project0.account WHERE account_id = (?) ;";		
 			PreparedStatement stmt = conn.prepareStatement(query);
 			stmt.setInt(1, a.getAccount_id());
 			if(!stmt.execute()) {
