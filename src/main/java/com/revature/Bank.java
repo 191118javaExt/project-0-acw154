@@ -549,6 +549,7 @@ public class Bank {
 							break;
 						}
 						if(u.getRole().equals("Client")) {
+							
 							int curr_id;
 							if(as.getAllAccounts().isEmpty()) {
 								curr_id = 1000;
@@ -879,7 +880,6 @@ public class Bank {
 							}
 							System.out.println("-------------------");
 							delay();
-							sc.nextLine();
 							break;
 						}
 						case "2": {
@@ -896,7 +896,6 @@ public class Bank {
 							}
 							System.out.println("-------------------");
 							delay();
-							sc.nextLine();
 							break;
 						}
 						case "3": {
@@ -921,18 +920,20 @@ public class Bank {
 							}
 							System.out.println("-------------------");
 							delay();
-							sc.nextLine();
 							break;
 						}
 						case "4": {
 							int holder = a.getAccount_id();
 
 							if(as.delete(a)) {
-								for(User user: us.findAllActive()) {
-									if(holder == user.getAccount_id()) {
-										us.detachAccount(user);
+								if(!us.findAllActive().isEmpty()) {
+									for(User user: us.findAllActive()) {
+										if(holder == user.getAccount_id()) {
+											us.detachAccount(user);
+										}
 									}
-								}
+								
+							}
 								System.out.println("Account " + holder + " deleted");	
 							} else {
 								System.out.println("Unable to delete");
