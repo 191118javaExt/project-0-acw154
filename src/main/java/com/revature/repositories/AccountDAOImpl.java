@@ -56,14 +56,14 @@ public class AccountDAOImpl implements AccountDAO{
 			stmt.setInt(3, a.getAccount_id());
 			if(!stmt.execute()) {
 				a.setBalance(a.getBalance() + amt);
+				logger.info("Account " + a.getAccount_id() + ": Deposit of " + amt + " successful");
 				return true;
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			logger.warn("Operation 'Deposit' Failed; " + e.getMessage());
 			return false;
-		}
-		logger.info("Account " + a.getAccount_id() + ": Deposit of " + amt + " successful");
+		}		
 		return true;
 	}
 
@@ -84,6 +84,7 @@ public class AccountDAOImpl implements AccountDAO{
 			if(!stmt.execute()) {
 				a.setBalance(a.getBalance() - amt);
 				a.setTransCounter(a.getTransCounter() + 1);
+				logger.info("Account " + a.getAccount_id() + ": Withdrawal of " + amt + " successful");
 				return true;
 			}
 		} catch (SQLException e) {
@@ -91,7 +92,7 @@ public class AccountDAOImpl implements AccountDAO{
 			logger.warn("Operation 'Withdraw' Failed; " + e.getMessage());
 			return false;
 		}
-		logger.info("Account " + a.getAccount_id() + ": Withdrawal of " + amt + " successful");
+		
 		return true;
 	}
 
