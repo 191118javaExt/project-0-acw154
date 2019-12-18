@@ -694,15 +694,18 @@ public class Bank {
 							break;
 						}
 						case "P":{
-							if(u.getAccount_id() <= 0) {
+							int temp = u.getAccount_id();
+							if(u.getAccount_id() > 0) {
 								if(us.setPending(u)) {
-									if(u.getAccount_id() > 0) {
-										us.detachAccount(u);
+									if(us.detachAccount(u)) {
+										System.out.println("User set to Pending");
+									} else {
+										us.approveClient(u, as.getAccount(temp));
+										System.out.println("Unable to set User to Pending");
 									}
-									System.out.println("Approval Status changed to Pending.");
-								} else {
-									System.out.println("Unable to change Approval Status");
 								}
+							} else {
+								System.out.println("User is not approved");
 							}
 							break;
 						}
@@ -755,7 +758,7 @@ public class Bank {
 								}
 								Account a = as.getAccount(newID);
 								if(a != null) {
-									if(us.updateAccount(u, a)) {
+									if(us.approveClient(u, a)) {
 										System.out.println("Account ID has been changed");
 									} else {
 										System.out.println("Unable to change Account ID");

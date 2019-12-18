@@ -389,7 +389,10 @@ public class UserDAOImpl implements UserDAO {
 	
 	/**
 	 * Updates the account ID of the account associated with a User
+	 * Deprecated: Any user updating their account would need to be approved, so it is better
+	 * 		to just use approveAccount(User, Account)
 	 */
+	@Deprecated
 	@Override
 	public boolean updateAccount(User u, Account a) {
 		try (Connection conn = ConnectionUtil.getConnection()){
@@ -413,12 +416,11 @@ public class UserDAOImpl implements UserDAO {
 	 */
 	public boolean detachAccount(User u) {
 		try (Connection conn = ConnectionUtil.getConnection()){
-			String query = "UPDATE project0.users SET account_id = (?) WHERE username = (?);";		
+			String query = "UPDATE project0.users SET account_id = NULL WHERE username = (?);";		
 			PreparedStatement stmt = conn.prepareStatement(query);
-			stmt.setInt(1, java.sql.Types.NULL);
-			stmt.setString(2, u.getUsername());
+			stmt.setString(1, u.getUsername());
 			if(!stmt.execute()) {
-				u.setAccount_id(-1);
+				u.setAccount_id(0);
 				return true;
 			}
 		} catch (SQLException exc) {
